@@ -12,16 +12,19 @@ permissions:
 jobs:
   postgres-pgvector:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pg: [14, 16, 17]
     env:
-      IMAGE: ghcr.io/${{ github.repository }}:postgres_17-pgvector
+      IMAGE: ghcr.io/${{ github.repository }}:postgres_${{ matrix.pg }}-pgvector
     steps:
       - uses: actions/checkout@v4
 
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      # --pull picks up the latest yolks:postgres_17 (Postgres minor/security updates).
+      # --pull picks up the latest yolks:postgres_<pg> (Postgres minor/security updates).
       - name: Build and push
         run: |
-          docker build --pull -t "$IMAGE" postgres-pgvector
+          docker build --pull --build-arg PG_VERSION=${{ matrix.pg }} -t "$IMAGE" postgres-pgvector
           docker push "$IMAGE"
