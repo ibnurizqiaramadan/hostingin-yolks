@@ -1,5 +1,5 @@
 # Egg Postgres image (yolks) + pgvector. Drop-in for ghcr.io/ptero-eggs/yolks:postgres_<PG_VERSION>:
-# same entrypoint, user and data layout, plus the `vector` extension.
+# same entrypoint, user and data layout, plus the `vector` extension and TLS (ssl.sh).
 #   docker build --build-arg PG_VERSION=17 -t <image> postgres-pgvector
 ARG PG_VERSION=17
 
@@ -15,4 +15,6 @@ RUN apk add --no-cache build-base \
 
 FROM ghcr.io/ptero-eggs/yolks:postgres_${PG_VERSION}
 COPY --from=build /out/ /
+COPY --chmod=755 ssl.sh /ssl.sh
+ENTRYPOINT ["/ssl.sh"]
 LABEL org.opencontainers.image.source=https://github.com/ibnurizqiaramadan/hostingin-yolks

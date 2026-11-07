@@ -21,3 +21,10 @@ CREATE EXTENSION vector;
 ```
 
 Other users with access to that database can then use the `vector` type and its indexes.
+
+## TLS (postgres_*-pgvector)
+
+`ssl.sh` runs before the stock entrypoint: on first start it writes a self-signed `server.crt`/`server.key`
+(10 years) into `postgres_db/` and adds `ssl = on`. Existing servers pick it up on their next start. Servers are
+reached by IP, so clients encrypt without verifying (`sslmode=require`; node-postgres needs
+`ssl: {rejectUnauthorized: false}` or `sslmode=no-verify`). Plain connections still work.
